@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Four Integrated Dynamic Loops</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #ffffff; color: #1a1a1a; padding: 1.5rem; }
+
+.progress-row { display: flex; align-items: center; margin-bottom: 1.5rem; }
+.step-dot { width: 36px; height: 36px; border-radius: 50%; border: 1px solid #ccc; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; color: #888; cursor: pointer; flex-shrink: 0; transition: all 0.2s; }
+.step-dot.done { background: #e8e8e8; border-color: #aaa; color: #444; }
+.step-line { flex: 1; height: 1px; background: #e0e0e0; transition: background 0.3s; }
+.step-line.done { background: #aaa; }
+
+.card { border: 1px solid #e8e8e8; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
+.card-accent { height: 5px; width: 100%; }
+.card-content { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+.card-title { font-size: 19px; font-weight: 600; line-height: 1.3; margin-bottom: 2px; }
+.card-body { font-size: 15px; color: #444; line-height: 1.75; flex: 1; }
+.card-body ul { margin: 8px 0 8px 20px; }
+.card-body ul li { margin-bottom: 5px; }
+.card-insight { border-radius: 0 8px 8px 0; padding: 10px 14px; font-size: 14px; font-style: italic; line-height: 1.6; border-left-width: 4px; border-left-style: solid; margin-top: 4px; }
+
+.nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; }
+.nav-label { font-size: 12px; color: #aaa; }
+button { padding: 7px 16px; font-size: 13px; border: 1px solid #ddd; border-radius: 8px; background: #fff; cursor: pointer; color: #333; }
+button:hover { background: #f4f4f4; }
+button:disabled { opacity: 0.35; cursor: default; }
+</style>
+</head>
+<body>
+
+<div class="progress-row" id="dots"></div>
+<div class="card" id="card"></div>
+<div class="nav-row">
+  <button onclick="go(-1)" id="prev-btn">← Previous</button>
+  <span class="nav-label" id="counter">1 of 4</span>
+  <button onclick="go(1)" id="next-btn">Next →</button>
+</div>
+
+<script>
+const steps = [
+  {
+    title: "The Perception\u2013Decision\u2013Action Loop",
+    body: `<p>Movement begins before a muscle fires. The nervous system is continuously receiving information from three distinct streams:</p>
+<ul>
+  <li><strong>somatosensory input</strong> from receptors distributed throughout the body &ndash; in muscles, tendons, joints and skin &ndash; signalling things like where a limb is in space, how much load a joint is carrying, or whether the ground underfoot has shifted;</li>
+  <li><strong>visual input</strong> from the eyes, providing spatial context about the environment and the position of objects within it; and</li>
+  <li><strong>vestibular input</strong> from the inner ear, which tracks the orientation and acceleration of the head in space &mdash; the system that tells you which way is up even when your eyes are closed.</li>
+</ul>
+<p style="margin-top:8px;">These three streams arrive simultaneously and are integrated with prior experience, learned movement patterns, and the demands of the current task. It is this integration that produces a <strong>motor decision</strong>: a precise, coordinated command for which muscles should activate, in what sequence, and with how much force.</p>
+<p style="margin-top:8px;">That motor command generates <strong>muscle activation patterns</strong>, which produce movement, whole-body mechanics, joint forces, mechanical behaviour at the tissue level. And that movement immediately generates new sensory information, which feeds straight back into the system. The loop closes and reopens, continuously, updating the plan in real time.</p>
+<p style="margin-top:8px;">What feels like a single intentional act is in fact a rapid, ongoing negotiation between intention and sensation, one that operates largely beneath conscious awareness.</p>`,
+    insight: "This loop is responsible for translating sensory perception and motor intent into coordinated, continuously updated movement. The loop is at work when a patient performs a functional reach test \u2014 integrating visual, proprioceptive, and vestibular input to coordinate the reach in real time. Every adjustment the patient makes mid-reach is this loop updating its plan.",
+    accent: "#0e68b3",
+    insightBorder: "#0e68b3",
+    insightBg: "#dbeafe",
+    insightText: "#1e3a8a"
+  },
+  {
+    title: "The Sensorimotor Spinal Loop",
+    body: `<p>Not all of this sensory processing travels to the brain. Embedded within muscles, tendons and joints are specialised receptors that continuously monitor the mechanical state of the body, detecting <strong>muscle length and velocity</strong>, <strong>tendon tension</strong>, <strong>joint position</strong>, and <strong>tissue strain</strong>. The signals they generate travel to the spinal cord, where they are processed and acted on locally, producing reflexive adjustments to muscle activation before the brain has even been informed.</p>
+<p style="margin-top:8px;">This is not a limitation of the system; it is one of its most elegant features. When you touch something unexpectedly hot, your hand withdraws before you are aware of any pain &ndash; the spinal cord has already acted on the signal and initiated the response while the message is still travelling upward to conscious awareness. The same principle governs <strong>joint stabilisation</strong>, rapid responses to perturbations, and the automatic redistribution of force across tissues during movement &mdash; all handled locally, in milliseconds, far faster than conscious regulation could allow. It is a local intelligence, running its own continuous loop to protect tissues and maintain movement efficiency while higher centres attend to other demands.</p>`,
+    insight: "This loop is responsible for fast, unconscious regulation of movement and load \u2014 the layer of the system that acts before awareness catches up. This is the loop you observe when testing a patellar reflex \u2014 a response completed entirely at the spinal level, without any involvement of the brain. After SCI, these spinal circuits remain intact but lose their supraspinal regulation.",
+    accent: "#03893d",
+    insightBorder: "#03893d",
+    insightBg: "#bbf7d0",
+    insightText: "#14532d"
+  },
+  {
+    title: "The Sensorimotor Supraspinal Loop",
+    body: `<p>In parallel, the same sensory information also travels upward to <strong>cortical and subcortical brain regions</strong> where it is woven together with memory, predictive models of how the body behaves, and long-term motor strategies. This is the loop responsible for <strong>motor learning</strong>.</p>
+<p style="margin-top:8px;">A pianist executing a passage at speed, each finger landing with a precision that no amount of in-the-moment attention could account for, is not succeeding <em>despite</em> conscious thought being absent &mdash; they are succeeding <em>because</em> of it. Years of practice have transferred the movement from conscious control into something deeper and more automatic, encoded as refined motor strategies that the brain now runs without deliberation. The movement has been absorbed into the architecture of the nervous system itself.</p>
+<p style="margin-top:8px;">This is also the loop that allows the body to anticipate rather than merely react &ndash; adjusting posture and force distribution before a perturbation occurs, not after. It continuously refines the perception&ndash;decision&ndash;action loop, making the whole system more precise and more efficient over time. It determines not just what the body does in a given moment, but what it becomes capable of.</p>`,
+    insight: "This loop is responsible for learning, adaptation, and the long-term refinement of movement \u2013 and it is the loop most profoundly affected by spinal cord injury. This is the loop engaged during gait retraining \u2014 where repeated practice gradually transfers conscious effort into automatic, efficient motor patterns. After SCI, it is also the loop that BioSpine is specifically designed to re-engage through intention-contingent movement.",
+    accent: "#e62429",
+    insightBorder: "#e62429",
+    insightBg: "#fecdd3",
+    insightText: "#9f1239"
+  },
+  {
+    title: "The Tissue Mechanobiology Loop",
+    body: `<p>There is a fourth loop, slower than the others and easy to overlook, but perhaps the most consequential over the long term. Every movement passes <strong>mechanical forces</strong> through the body&rsquo;s tissues: muscle, tendon, cartilage, bone. The cells within those tissues are not passive recipients of that loading. They sense the mechanical deformation and respond through <strong>cellular signalling pathways</strong> that drive structural change, remodelling and strengthening when load is appropriate, degenerating when it is absent, excessive, or poorly distributed. A stress fracture and the bone loss that follows prolonged immobility are, in this sense, two sides of the same coin &ndash; both are the tissue&rsquo;s response to loading that has moved outside the range it was built for.</p>
+<p style="margin-top:8px;">This is why movement behaviour over time determines tissue health. Bone is not fixed scaffolding; it is living tissue, continuously broken down and rebuilt, and the primary signal governing that process is mechanical load. Appropriate loading sustains the musculoskeletal system. The absence of loading quietly dismantles it.</p>
+<p style="margin-top:8px;">The volume, frequency, and distribution of mechanical loading across time determines the trajectory of tissue adaptation, a principle that directly informs why BioSpine sessions target a specific intensity and frequency.</p>`,
+    insight: "This loop is responsible for the long-term structural integrity of the musculoskeletal system \u2013 and it depends entirely on movement to function. The bone density loss seen after SCI (up to 4% per month in the early period) and the strengthening response to resumed loading are both expressions of this loop \u2014 the tissue responding to the mechanical signal it receives, or does not receive.",
+    accent: "#b34000",
+    insightBorder: "#b34000",
+    insightBg: "#fed7aa",
+    insightText: "#7c2d12"
+  }
+];
+
+let current = 0;
+
+function render() {
+  const s = steps[current];
+
+  document.getElementById("card").innerHTML = `
+    <div class="card-accent" style="background:${s.accent};"></div>
+    <div class="card-content">
+      <div class="card-title" style="color:${s.accent};">${s.title}</div>
+      <div class="card-body">${s.body}</div>
+      <div class="card-insight" style="border-left-color:${s.insightBorder}; background:${s.insightBg}; color:${s.insightText};">${s.insight}</div>
+    </div>
+  `;
+
+  document.getElementById("counter").textContent = `${current + 1} of ${steps.length}`;
+  document.getElementById("prev-btn").disabled = current === 0;
+  document.getElementById("next-btn").disabled = current === steps.length - 1;
+
+  const dotsEl = document.getElementById("dots");
+  dotsEl.innerHTML = "";
+  steps.forEach((step, i) => {
+    if (i > 0) {
+      const line = document.createElement("div");
+      line.className = "step-line" + (i <= current ? " done" : "");
+      dotsEl.appendChild(line);
+    }
+    const dot = document.createElement("div");
+    if (i === current) {
+      dot.className = "step-dot active";
+      dot.style.background = step.accent;
+      dot.style.borderColor = step.accent;
+      dot.style.color = "#fff";
+    } else if (i < current) {
+      dot.className = "step-dot done";
+    } else {
+      dot.className = "step-dot";
+    }
+    dot.textContent = i + 1;
+    dot.onclick = (function(idx){ return function(){ current = idx; render(); }; })(i);
+    dotsEl.appendChild(dot);
+  });
+}
+
+function go(dir) {
+  current = Math.max(0, Math.min(steps.length - 1, current + dir));
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
